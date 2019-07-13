@@ -1,0 +1,4 @@
+#! /bin/bash
+VAULT_SETTINGS=$(docker-compose exec vault vault read --format=json dbs/creds/mydb-admin)
+VAULT_USERNAME=$(echo $VAULT_SETTINGS | docker run --rm -i colstrom/jq -r '.data.username')
+docker-compose exec database psql -U $VAULT_USERNAME -d mydb

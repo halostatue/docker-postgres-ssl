@@ -1,0 +1,10 @@
+#!/bin/bash
+
+OUTPUT_FOLDER="${1}"
+shift
+# shellcheck disable=SC2164
+OUTPUT_FOLDER="$(cd "$(dirname "${OUTPUT_FOLDER}")"; pwd -P)/$(basename "${OUTPUT_FOLDER}")"
+
+mkdir -p "${OUTPUT_FOLDER}"
+
+docker run --rm -it -w /out -v "${OUTPUT_FOLDER}":/out:rw svagi/openssl ${@}

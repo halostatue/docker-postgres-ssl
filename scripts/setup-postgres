@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "Setting up postgres hba settings"
+cat > "${PGDATA}"/pg_hba.conf <<'__END__'
+# note that the container runs on a private network so we don't do
+# address filtering here. If you wanted you could detect the subnet
+# and add it instead, or pass a --env to Docker to substitute, but
+# it's pretty pointless to do so.
+#
+# TYPE      DATABASE       USER           ADDRESS              METHOD
+local       all            all                                 peer
+hostnossl   all            all            0.0.0.0/0            reject
+hostnossl   all            all            ::0/0                reject
+host        all            all            0.0.0.0/0            md5
+host        all            all            ::0/0                md5
+__END__
+
+echo "Adding SSL settings to postgresql.conf file"
+cat <<EOM >> "${PGDATA}"/postgresql.conf
+ssl = on
+ssl_cert_file = '/var/ssl/server-cert.pem'
+ssl_key_file = '/var/ssl/server-key.pem'
+ssl_ca_file = '/var/ssl/ca.pem'
+EOM
+
+# create regression test user
+psql -c "CREATE USER test WITH PASSWORD 'test';"
+psql -c "CREATE DATABASE test WITH OWNER 'test';"

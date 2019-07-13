@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  postgres96:
+    image: postgres:9.6-alpine
+    restart: always
+    # shm_size: '256m'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgresql96:/var/lib/postgresql
+      - postgresql96_data:/var/lib/postgresql/data
+      - ./run/ssl-files:/var/ssl:ro
+      - ./scripts/setup-postgres:/docker-entrypoint-initdb.d/001-setup.sh:ro
+
+  postgres11:
+    image: postgres:11-alpine
+    restart: always
+    # shm_size: '256m'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # POSTGRES_DB: db
+      # PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgresql11:/var/lib/postgresql
+      - postgresql11_data:/var/lib/postgresql/data
+      - ./run/ssl-files:/var/ssl:ro
+      - ./scripts/setup-postgres:/docker-entrypoint-initdb.d/001-setup.sh:ro
+
+  # vault:
+  #     image: vault:0.10.1
+  #     ports:
+  #       - 8200:8200
+  #     environment:
+  #       - VAULT_TOKEN=secret-token
+  #       - VAULT_ADDR=http://127.0.0.1:8200/
+  #     volumes:
+  #       - ./scripts/setup-and-run-vault:/setup-and-run.sh
+  #     command: /setup-and-run.sh
+
+volumes:
+  postgresql96:
+  postgresql96_data:
+  postgresql11:
+  postgresql11_data:
